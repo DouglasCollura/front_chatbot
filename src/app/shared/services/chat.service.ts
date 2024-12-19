@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
@@ -8,13 +9,13 @@ import { Observable } from 'rxjs';
 export class ChatService {
 
   private http = inject(HttpClient)
-
+  private url = environment.CHATBOT_URL
 
   sendAudio(data:any):Observable<any>{
     let headers = new HttpHeaders();
     headers.append('Content-Type', 'multipart/form-data');
     headers.append('Accept', 'application/json');
 
-   return this.http.post('http://127.0.0.1:8000/upload-audio', data, { headers: headers })
+   return this.http.post(`${this.url}/upload-audio`, data, { headers: headers })
   }
 }
