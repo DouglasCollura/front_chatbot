@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, SecurityContext, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, SecurityContext, signal, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as RecordRTC from 'recordrtc';
 import { ChatService } from '../shared/services/chat.service';
@@ -18,7 +18,7 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 })
 export class ChatComponent {
 
-
+  @ViewChild('uploader') ElementRef: any;
   private domSanitizer = inject(DomSanitizer);
   private chatService = inject(ChatService);
 
@@ -102,6 +102,23 @@ export class ChatComponent {
     });
   }
 
+  sendFile(file:any){
+    this.loadingRequest.set(true);
+    let formData = new FormData();
+    formData.append('files', file, 'file.pdf');
+
+    this.chatService.sendFile(formData).subscribe((response) => {
+      console.log(response);
+      this.loadingRequest.set(false);
+      this.messages.update(mes=> [...mes, {sender:'bot', type:'text', content:response.message}])
+
+    }, (error) => {
+      console.error(error);
+      this.loadingRequest.set(false);
+    });
+  }
+
+
   startTimer() {
     if (!this.timer()) {
       this.timer.set(setInterval(() => this.updateTime(), 1000));
@@ -134,10 +151,10 @@ export class ChatComponent {
 
   getFile({target:{files}}:any){
     console.log(files[0])
+    this.sendFile(files[0])
     this.messages.update(mes=> [...mes, {sender:'user', type:'file', content:files[0].name, size:this.transform(files[0].size)}])
-
+    this.ElementRef.nativeElement.value = ''; // clear the file input after sending
   }
-
 
   transform(size: number): string {
     if (size === 0) {
