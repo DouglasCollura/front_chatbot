@@ -18,4 +18,13 @@ export class ChatService {
 
    return this.http.post(`${this.url}/upload-audio`, data, { headers: headers })
   }
+
+
+  sendFile(data:any):Observable<any>{
+    let headers = new HttpHeaders();
+    headers.append('Content-Type', 'multipart/form-data');
+    headers.append('Accept', 'application/json');
+
+   return this.http.post(`${this.url}/upload-file`, data, { headers: headers })
+  }
 }
